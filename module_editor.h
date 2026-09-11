@@ -45,8 +45,6 @@ private:
     void handleFileDelete(AsyncWebServerRequest *request);
     void handleFsInfo(AsyncWebServerRequest *request);
 
-    String escapeJsonStr(const String& s);
-
 protected:
     static const size_t MAX_UPLOAD_SIZE = 1024 * 1024; // 1MB
 #if ESP32

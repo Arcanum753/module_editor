@@ -2,6 +2,7 @@
 #include "core_web/FSWebServerLib.h"
 #include "module_editor.h"
 #include "main.h"
+#include "common/common.h"
 #include "module_editor_version.h"
 
 CLASS_MODULE_EDITOR module_editor;
@@ -130,7 +131,7 @@ void CLASS_MODULE_EDITOR::handleFileList(AsyncWebServerRequest *request) {
         output += "{\"type\":\"";
         output += (isDir) ? "dir" : "file";
         output += "\",\"name\":\"";
-        output += escapeJsonStr(String(file.name()));
+        output += escapeJson(String(file.name()));
         output += "\",\"size\":";
         output += isDir ? "0" : String(file.size());
         output += "}";
@@ -149,7 +150,7 @@ void CLASS_MODULE_EDITOR::handleFileList(AsyncWebServerRequest *request) {
         output += "\",\"name\":\"";
         String entryName = String(entry.name());
         if (entryName.startsWith("/")) entryName = entryName.substring(1);
-        output += escapeJsonStr(entryName);
+        output += escapeJson(entryName);
         output += "\",\"size\":";
         output += String(entry.size());
         output += "}";
@@ -234,34 +235,4 @@ void CLASS_MODULE_EDITOR::html_ver_get(AsyncWebServerRequest *request) {
     values += "editorgentime|" + getGeneratedTime() + "|div\n";
     values += "editorgendate|" + getCommitDateStr() + "|div\n";
     request->send(200, "text/plain", values);
-}
-
-// ============================================================
-// Конкретная логика модуля
-// ============================================================
-
-String CLASS_MODULE_EDITOR::escapeJsonStr(const String& s) {
-    String out;
-    out.reserve(s.length());
-    for (size_t i = 0; i < s.length(); i++) {
-        char c = s.charAt(i);
-        switch (c) {
-            case '"':  out += "\\\""; break;
-            case '\\': out += "\\\\"; break;
-            case '\b': out += "\\b";  break;
-            case '\f': out += "\\f";  break;
-            case '\n': out += "\\n";  break;
-            case '\r': out += "\\r";  break;
-            case '\t': out += "\\t";  break;
-            default:
-                if ((unsigned char)c < 0x20) {
-                    char buf[8];
-                    snprintf(buf, sizeof(buf), "\\u%04x", (unsigned char)c);
-                    out += buf;
-                } else {
-                    out += c;
-                }
-        }
-    }
-    return out;
 }
